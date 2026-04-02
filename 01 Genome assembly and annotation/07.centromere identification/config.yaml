@@ -1,0 +1,7 @@
+sample: chrZ:44000000-45000000
+fasta: chrZ:44000000-45000000.fa
+window: 4000
+nbatch: 4
+alnthreads: 4
+mm_f: 10000
+tempdir: temp

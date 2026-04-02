@@ -1,0 +1,5 @@
+PROTEIN	Liftoff	15
+PROTEIN miniprot	10
+ABINITIO_PREDICTION	Augustus	5
+OTHER_PREDICTION	transdecoder	15
+OTHER_PREDICTION	stringtie	8

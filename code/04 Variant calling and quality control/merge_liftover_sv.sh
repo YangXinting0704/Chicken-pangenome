@@ -5,19 +5,19 @@ VCF=sorted.long50.norm.GGsu_4.vcf.gz
 FASTA=BY.fa
 OUT=GGsu_4.SV.toBY.vcf
 
-# 临时文件
+# temporary files
 ALT_TABLE=ALT_table.tsv
 
-# ---------- 1. 提取 ID->ALT 映射表 ----------
+# ---------- 1. Extract the ID->ALT mapping table ----------
 if [ ! -f "$ALT_TABLE" ]; then
     echo "Generating ID->ALT table..."
     bcftools query -f '%ID\t%ALT\n' $VCF > $ALT_TABLE
 fi
 
-# ---------- 2. 输出 VCF header ----------
+# ---------- 2. Output the VCF header ----------
 bcftools view -h $VCF | sed 's/WChang/BY/' > $OUT
 
-# ---------- 3. 并行处理 BED ----------
+# ---------- 3. Parallel processing BED ----------
 echo "Processing BED in parallel..."
 
 cat $BED | parallel -j 80 --colsep '\t' '
@@ -28,13 +28,13 @@ cat $BED | parallel -j 80 --colsep '\t' '
     POS=$((START + 1))
     LEN=$((END - START))
 
-    # 取 REF
+    # extract REF
     REF=$(samtools faidx '"$FASTA"' ${CHR}:${POS}-$((${POS}+LEN-1)) | tail -n +2 | tr -d "\n")
 
-    # 从 hash-table 查 ALT（避免 bcftools 调用）
+    # Look up ALT from hash-table (avoid calling bcftools)
     ALT=$(grep -P "^${ID}\t" '"$ALT_TABLE"' | cut -f2)
 
-    # 输出 VCF 行
+    # Output the VCF line
     printf "%s\t%d\t%s\t%s\t%s\t.\tPASS\tSVTYPE=NA\n" "$CHR" "$POS" "$ID" "$REF" "$ALT"
 ' >> $OUT
 
